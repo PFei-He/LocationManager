@@ -26,12 +26,10 @@
 //  THE SOFTWARE.
 //
 
-#if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_7_1
-    #define kRequestAlwaysAuthorization(locationManager) [locationManager requestAlwaysAuthorization];
-    #define kRequestWhenInUseAuthorization(locationManager) [locationManager requestWhenInUseAuthorization];
+#if __IPHONE_8_0 && __IPHONE_OS_VERSION_MAX_ALLOWED >=  __IPHONE_8_0
+    #define kVERSION_IS_IOS8 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 #else
-    #define kRequestAlwaysAuthorization(locationManager) ((void)0)
-    #define kRequestWhenInUseAuthorization(locationManager) ((void)0)
+    #define kVERSION_IS_IOS8 NO
 #endif
 
 #import "LocationManager.h"
@@ -84,7 +82,10 @@ typedef void(^nameBlock)(NSString *, float, float);
         _locationManager.delegate = self;
         _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         _locationManager.distanceFilter = 1000.f;
-        kRequestAlwaysAuthorization(_locationManager)
+        if(kVERSION_IS_IOS8) {
+            [_locationManager requestAlwaysAuthorization];
+            [_locationManager requestWhenInUseAuthorization];
+        }
         [_locationManager startUpdatingLocation];
     } else {
         [self setupAlertViewWithTitle:@"提示" message:@"请打开位置服务"];
